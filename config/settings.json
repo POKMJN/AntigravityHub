@@ -1,0 +1,9 @@
+{
+  "cn_commit_sha": "",
+  "proxy_port": 7895,
+  "mihomo_api_port": 9095,
+  "auto_start_proxy": true,
+  "auto_start_mihomo": true,
+  "check_updates_on_start": true,
+  "theme": "dark"
+}
