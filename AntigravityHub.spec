@@ -5,7 +5,7 @@ ctk_datas = collect_data_files('customtkinter')
 
 a = Analysis(
     ['main.py'],
-    pathex=['C:/Users/22816/antigravity_manager'],
+    pathex=['.'],
     binaries=[('C:/Users/22816/antigravity_proxy/mihomo.exe', '.')],
     datas=[('assets', 'assets'), ('config', 'config'), ('builtin_assets', 'builtin_assets')] + ctk_datas,
     hiddenimports=['customtkinter', 'PIL', 'psutil', 'yaml', 'requests', 'sqlite3', 'win32api', 'win32con'],

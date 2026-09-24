@@ -108,12 +108,13 @@ class PatchInjector:
         # 1. 检查 version.dll (存在且大于 100KB)
         proxy_injected = AG_DLL.exists() and AG_DLL.stat().st_size > 100_000
 
-        # 2. 检查 config.json 代理端口
+        # 2. 检查 config.json 代理端口 (支持 7895 专线或 7890 本地客户端)
         port_configured = False
         if AG_CONFIG.exists():
             try:
                 data = json.loads(AG_CONFIG.read_text(encoding="utf-8"))
-                port_configured = (data.get("proxy", {}).get("port") == 7895)
+                p = data.get("proxy", {}).get("port")
+                port_configured = (p in (7895, 7890))
             except Exception:
                 port_configured = False
 
@@ -197,13 +198,24 @@ class PatchInjector:
 
             if "proxy" not in config_data:
                 config_data["proxy"] = {}
-            config_data["proxy"]["port"] = 7895
+
+            target_port = 7895
+            for test_p in (7895, 7890):
+                try:
+                    import socket
+                    with socket.create_connection(("127.0.0.1", test_p), timeout=0.3):
+                        target_port = test_p
+                        break
+                except Exception:
+                    pass
+
+            config_data["proxy"]["port"] = target_port
             config_data["proxy"]["host"] = "127.0.0.1"
             config_data["proxy"]["type"] = "socks5"
             config_data["proxy"]["enabled"] = True
 
             AG_CONFIG.write_text(json.dumps(config_data, indent=2, ensure_ascii=False), encoding="utf-8")
-            log("✓ 已同步定向代理端口配置 (7895 专线绑定)")
+            log(f"✓ 已同步定向代理端口配置 ({target_port} 专线对齐)")
             return True
         except Exception as e:
             log(f"✗ 写入 config.json 失败：{e}")
