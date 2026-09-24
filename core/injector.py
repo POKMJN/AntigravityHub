@@ -300,3 +300,6 @@ class PatchInjector:
 
         log("✓ 原版环境还原完毕。")
         return True
+
+    # 兼容别名
+    restore = restore_original

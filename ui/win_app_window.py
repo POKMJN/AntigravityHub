@@ -22,14 +22,13 @@ from ui.win_components import (
     get_win_font, WinBadge,
 )
 from core.injector import PatchInjector, InjectionStatus
-from core.mihomo_service import MihomoService
 from core.updater import ProxyUpdater, CNUpdater
 
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
 
-WINDOW_W = 820
-WINDOW_H = 820
+WINDOW_W = 780
+WINDOW_H = 680
 
 
 class WinAppWindow:
@@ -37,9 +36,9 @@ class WinAppWindow:
 
     def __init__(self):
         self.root = ctk.CTk()
-        self.root.title("AntigravityHub — 反重力综合管理中心")
+        self.root.title("AntigravityHub — 反重力补丁注入与汉化中心")
         self.root.geometry(f"{WINDOW_W}x{WINDOW_H}")
-        self.root.minsize(760, 720)
+        self.root.minsize(720, 580)
         self.root.configure(fg_color=BG_ROOT)
 
         self._center_window()
@@ -57,7 +56,6 @@ class WinAppWindow:
             pass
 
         # 核心服务
-        self._mihomo = MihomoService()
         self._proxy_updater = ProxyUpdater()
         self._cn_updater = CNUpdater()
         self._log_drawer_visible = False
@@ -124,13 +122,10 @@ class WinAppWindow:
         )
         self._scroll.pack(fill="both", expand=True, padx=pad_x, pady=(4, 6))
 
-        # 卡片 1: 反重力核心环境与内置离线注入引擎
+        # 卡片 1: 反重力核心补丁注入与汉化管理
         self._build_patch_card(self._scroll)
 
-        # 卡片 2: 定向代理专线服务 (Mihomo 韩国/德国 Failover)
-        self._build_proxy_card(self._scroll)
-
-        # 卡片 3: 云端版本同步与检查
+        # 卡片 2: 云端版本同步与检查
         self._build_update_card(self._scroll)
 
         # ── 3. 日志抽屉面板 (可折叠) ──────────────────────────────
@@ -199,14 +194,14 @@ class WinAppWindow:
 
         ctk.CTkLabel(
             head,
-            text="反重力运行环境与内置补丁注入",
+            text="反重力补丁注入与中文汉化中心",
             font=get_win_font(15, "bold"),
             text_color=TEXT_MAIN,
         ).pack(side="left")
 
         ctk.CTkLabel(
             head,
-            text="支持一键自动热注入与官方原版还原",
+            text="内置免代理补丁与中文汉化，支持一键注入与官方原版一键还原",
             font=get_win_font(11),
             text_color=TEXT_MUTED,
             padx=12,
@@ -253,14 +248,11 @@ class WinAppWindow:
         badges_row = ctk.CTkFrame(status_row, fg_color="transparent")
         badges_row.pack(side="right")
 
-        self._badge_proxy = WinBadge(badges_row, text="代理: 检测中", state="info")
+        self._badge_proxy = WinBadge(badges_row, text="免代理补丁: 检测中", state="info")
         self._badge_proxy.pack(side="left", padx=(0, 6))
 
-        self._badge_cn = WinBadge(badges_row, text="汉化: 检测中", state="info")
-        self._badge_cn.pack(side="left", padx=(0, 6))
-
-        self._badge_port = WinBadge(badges_row, text="端口7895: 检测中", state="info")
-        self._badge_port.pack(side="left")
+        self._badge_cn = WinBadge(badges_row, text="中文汉化: 检测中", state="info")
+        self._badge_cn.pack(side="left")
 
         # 分割线
         sep = ctk.CTkFrame(content, fg_color=BORDER_COLOR, height=1)
@@ -272,7 +264,7 @@ class WinAppWindow:
 
         ctk.CTkButton(
             btn_r1,
-            text="⚡ 一键全自动热注入 (代理劫持 + 完整汉化，推荐)",
+            text="⚡ 一键全自动注入 (免代理补丁 + 完整中文汉化，推荐)",
             command=self._action_inject_all,
             font=get_win_font(13, "bold"),
             fg_color=COLOR_ACCENT,
@@ -292,8 +284,8 @@ class WinAppWindow:
 
         ctk.CTkButton(
             btn_r2,
-            text="🛡 注入代理补丁",
-            command=self._action_inject_proxy,
+            text="🌐 改中文 (注入汉化)",
+            command=self._action_inject_cn,
             font=get_win_font(12),
             fg_color=COLOR_NEUTRAL,
             hover_color=COLOR_NEUTRAL_HOVER,
@@ -303,8 +295,8 @@ class WinAppWindow:
 
         ctk.CTkButton(
             btn_r2,
-            text="🌐 注入汉化包",
-            command=self._action_inject_cn,
+            text="🛡 注入免代理补丁",
+            command=self._action_inject_proxy,
             font=get_win_font(12),
             fg_color=COLOR_NEUTRAL,
             hover_color=COLOR_NEUTRAL_HOVER,
@@ -314,7 +306,7 @@ class WinAppWindow:
 
         ctk.CTkButton(
             btn_r2,
-            text="↩ 还原官方原版",
+            text="↩ 还原官方原版英文",
             command=self._action_restore,
             font=get_win_font(12),
             fg_color=COLOR_NEUTRAL,
@@ -325,7 +317,7 @@ class WinAppWindow:
 
         ctk.CTkButton(
             btn_r2,
-            text="⟳ 刷新状态",
+            text="⟳ 刷新检测",
             command=self._refresh_status,
             font=get_win_font(12),
             fg_color=COLOR_NEUTRAL,
@@ -334,108 +326,7 @@ class WinAppWindow:
             height=34,
         ).grid(row=0, column=3, sticky="ew")
 
-    def _build_proxy_card(self, parent):
-        """卡片 2: 定向代理专线服务"""
-        card = ctk.CTkFrame(
-            parent,
-            fg_color=BG_CARD,
-            border_color=BORDER_COLOR,
-            border_width=1,
-            corner_radius=14,
-        )
-        card.pack(fill="x", pady=(0, 10))
 
-        content = ctk.CTkFrame(card, fg_color="transparent")
-        content.pack(fill="x", padx=20, pady=16)
-
-        head = ctk.CTkFrame(content, fg_color="transparent")
-        head.pack(fill="x", pady=(0, 8))
-
-        ctk.CTkLabel(
-            head,
-            text="定向代理专线服务 (Mihomo 内核直连)",
-            font=get_win_font(15, "bold"),
-            text_color=TEXT_MAIN,
-        ).pack(side="left")
-
-        ctk.CTkLabel(
-            head,
-            text="绑定 7895 端口 · 故障转移 (首选韩国Z01 → 备用德国原生)",
-            font=get_win_font(11),
-            text_color=TEXT_MUTED,
-            padx=12,
-        ).pack(side="left")
-
-        row = ctk.CTkFrame(content, fg_color="transparent")
-        row.pack(fill="x")
-
-        # 左侧状态与节点
-        left = ctk.CTkFrame(row, fg_color="transparent")
-        left.pack(side="left", fill="x", expand=True)
-
-        self._lbl_proxy_status = ctk.CTkLabel(
-            left,
-            text="● 代理状态: 检测中…",
-            font=get_win_font(13, "bold"),
-            text_color=TEXT_MUTED,
-            anchor="w",
-        )
-        self._lbl_proxy_status.pack(anchor="w")
-
-        info_line = ctk.CTkFrame(left, fg_color="transparent")
-        info_line.pack(anchor="w", pady=(4, 0))
-
-        self._lbl_active_node = ctk.CTkLabel(
-            info_line,
-            text="当前活跃节点: 韩国Z01",
-            font=get_win_font(11),
-            text_color=TEXT_MUTED,
-        )
-        self._lbl_active_node.pack(side="left", padx=(0, 10))
-
-        self._badge_latency = WinBadge(info_line, text="延迟: –", state="neutral")
-        self._badge_latency.pack(side="left")
-
-        # 右侧操作按钮
-        right = ctk.CTkFrame(row, fg_color="transparent")
-        right.pack(side="right")
-
-        self._btn_proxy_toggle = ctk.CTkButton(
-            right,
-            text="⏹ 停止专线",
-            command=self._toggle_proxy,
-            font=get_win_font(12, "bold"),
-            fg_color=COLOR_DANGER,
-            hover_color=COLOR_DANGER_HOVER,
-            corner_radius=8,
-            width=100,
-            height=34,
-        )
-        self._btn_proxy_toggle.pack(side="left", padx=(0, 8))
-
-        ctk.CTkButton(
-            right,
-            text="⚡ 测速",
-            command=self._test_latency,
-            font=get_win_font(12),
-            fg_color=COLOR_NEUTRAL,
-            hover_color=COLOR_NEUTRAL_HOVER,
-            corner_radius=8,
-            width=75,
-            height=34,
-        ).pack(side="left", padx=(0, 8))
-
-        ctk.CTkButton(
-            right,
-            text="⇄ 切换节点",
-            command=self._switch_node,
-            font=get_win_font(12),
-            fg_color=COLOR_NEUTRAL,
-            hover_color=COLOR_NEUTRAL_HOVER,
-            corner_radius=8,
-            width=90,
-            height=34,
-        ).pack(side="left")
 
     def _build_update_card(self, parent):
         """卡片 3: 云端版本同步与检查"""
@@ -590,11 +481,10 @@ class WinAppWindow:
         """启动自检"""
         def _bg():
             status = PatchInjector.check_status()
-            proxy_running = self._mihomo.is_running()
 
             def _update():
                 # 1. 刷新界面控件
-                self._update_status_ui(status, proxy_running)
+                self._update_status_ui(status)
 
                 # 2. 智能横幅与决策
                 if not status.is_installed:
@@ -602,17 +492,17 @@ class WinAppWindow:
                 elif status.needs_injection:
                     msg = f"检测到反重力处于未注入状态（{status.status_summary}）。是否立即一键热注入？"
                     self._show_infobar(f"⚠️ {msg}", "warning")
-                    if messagebox.askyesno("智能检测决策提示", f"{msg}\n\n点击「是」将自动写入代理补丁与中文汉化，完全不影响官方功能。", parent=self.root):
+                    if messagebox.askyesno("智能检测决策提示", f"{msg}\n\n点击「是」将自动写入免代理补丁与中文汉化，完全不影响官方功能。", parent=self.root):
                         self._action_inject_all()
                 else:
-                    self._show_infobar("✓ 反重力环境状态优良，内置代理补丁与中文汉化已全部生效就绪。", "success")
+                    self._show_infobar("✓ 反重力运行环境优良，免代理补丁与中文汉化已全部生效就绪。", "success")
 
             self.dispatch(_update)
 
         threading.Thread(target=_bg, daemon=True).start()
 
     def _refresh_status(self):
-        self.log("正在重新检测反重力运行环境与专线状态…")
+        self.log("正在重新检测反重力运行环境与补丁状态…")
         self._auto_check_and_prompt()
 
     def _show_infobar(self, text: str, state: str = "info"):
@@ -626,40 +516,19 @@ class WinAppWindow:
         self._infobar_frame.configure(fg_color=bg, border_color=border)
         self._lbl_infobar.configure(text=text, text_color=fg)
 
-    def _update_status_ui(self, status: InjectionStatus, proxy_running: bool):
+    def _update_status_ui(self, status: InjectionStatus):
         run_tag = " (运行中)" if status.is_running else " (已停止)"
         self._lbl_ag_ver.configure(text=f"Antigravity IDE  {status.version_str}{run_tag}")
         self._lbl_ag_detail.configure(text=f"状态概况: {status.status_summary}")
 
         self._badge_proxy.update_badge(
-            "Proxy已就绪" if status.proxy_injected else "Proxy未注入",
+            "免代理补丁: 已就绪" if status.proxy_injected else "免代理补丁: 未注入",
             "success" if status.proxy_injected else "danger"
         )
         self._badge_cn.update_badge(
-            "已汉化" if status.cn_injected else "原版英文",
+            "语言: 简体中文" if status.cn_injected else "语言: 原版英文",
             "success" if status.cn_injected else "warning"
         )
-        self._badge_port.update_badge(
-            "7895端口对齐" if status.port_configured else "端口未对齐",
-            "success" if status.port_configured else "warning"
-        )
-
-        if proxy_running:
-            self._lbl_proxy_status.configure(text="● 代理状态: 正在运行 (专线监听 7895)", text_color=COLOR_SUCCESS)
-            self._btn_proxy_toggle.configure(text="⏹ 停止专线", fg_color=COLOR_DANGER, hover_color=COLOR_DANGER_HOVER)
-        else:
-            self._lbl_proxy_status.configure(text="● 代理状态: 已停止", text_color=COLOR_WARNING)
-            self._btn_proxy_toggle.configure(text="▶ 启动专线", fg_color=COLOR_SUCCESS, hover_color=COLOR_SUCCESS_HOVER)
-
-        try:
-            curr_node = self._mihomo.get_current_node()
-            if isinstance(curr_node, dict):
-                node_name = curr_node.get("name", "韩国Z01")
-            else:
-                node_name = str(curr_node)
-            self._lbl_active_node.configure(text=f"当前活跃节点: {node_name}")
-        except Exception:
-            pass
 
     # ────────────────────────────────────────────────────────────
     # 补丁注入动作
@@ -667,40 +536,47 @@ class WinAppWindow:
 
     def _action_inject_all(self):
         """一键全自动热注入"""
-        self.log("🚀 开始执行一键全自动热注入...")
+        self.log("🚀 开始执行一键全自动注入 (免代理补丁 + 中文汉化)...")
 
         def _bg():
             ok = PatchInjector.inject_all(log_cb=self.log)
             if ok:
-                if not self._mihomo.is_running():
-                    self.log("正在启动 Mihomo 定向代理专线服务...")
-                    self._mihomo.start()
-                self.log("✓ 全自动注入完成！反重力已支持全局定向加速与中文界面。", "success")
-                self.dispatch(lambda: messagebox.showinfo("注入成功", "反重力补丁已成功注入！\n代理专线已就绪，汉化已生效。", parent=self.root))
+                self.log("✓ 全自动注入完成！免代理补丁与中文汉化均已生效。", "success")
+                self.dispatch(lambda: messagebox.showinfo(
+                    "注入成功",
+                    "反重力补丁已成功注入！\n免代理补丁已就绪，中文汉化已生效。\n若 Antigravity 正在运行，重启即可直接体验！",
+                    parent=self.root
+                ))
             else:
                 self.log("✗ 注入过程中存在失败项，请检查日志", "error")
-                self.dispatch(lambda: messagebox.showerror("注入失败", "注入失败，请查看运行日志控制台获取详细报错。", parent=self.root))
+                self.dispatch(lambda: messagebox.showerror(
+                    "注入失败",
+                    "注入失败，请查看运行日志控制台获取详细报错。",
+                    parent=self.root
+                ))
             self._auto_check_and_prompt()
 
         threading.Thread(target=_bg, daemon=True).start()
 
     def _action_inject_proxy(self):
         """仅注入代理补丁"""
-        self.log("🛡 开始注入代理补丁 (version.dll + config.json)...")
+        self.log("🛡 开始注入免代理补丁 (version.dll + config.json)...")
         def _bg():
             ok = PatchInjector.inject_proxy(log_cb=self.log)
             if ok:
-                self.log("✓ 代理补丁注入成功！", "success")
+                self.log("✓ 免代理补丁注入成功！", "success")
+                self.dispatch(lambda: messagebox.showinfo("注入成功", "免代理补丁注入成功！", parent=self.root))
             self._auto_check_and_prompt()
         threading.Thread(target=_bg, daemon=True).start()
 
     def _action_inject_cn(self):
         """仅注入汉化包"""
-        self.log("🌐 开始注入中文汉化包 (app.asar)...")
+        self.log("🌐 开始改中文 (注入汉化包 app.asar)...")
         def _bg():
             ok = PatchInjector.inject_cn(log_cb=self.log)
             if ok:
-                self.log("✓ 汉化包注入成功！", "success")
+                self.log("✓ 中文汉化包注入成功！", "success")
+                self.dispatch(lambda: messagebox.showinfo("注入成功", "中文汉化包注入成功！重启 Antigravity 即可看到中文界面。", parent=self.root))
             self._auto_check_and_prompt()
         threading.Thread(target=_bg, daemon=True).start()
 
@@ -710,51 +586,11 @@ class WinAppWindow:
             return
         self.log("↩ 正在还原官方原版...")
         def _bg():
-            ok = PatchInjector.restore(log_cb=self.log)
+            ok = PatchInjector.restore_original(log_cb=self.log)
             if ok:
                 self.log("✓ 已成功还原为官方原生状态！", "success")
-                self.dispatch(lambda: messagebox.showinfo("还原完成", "已恢复为官方原生版本。", parent=self.root))
+                self.dispatch(lambda: messagebox.showinfo("还原完成", "已恢复为官方原生英文版本。", parent=self.root))
             self._auto_check_and_prompt()
-        threading.Thread(target=_bg, daemon=True).start()
-
-    # ────────────────────────────────────────────────────────────
-    # 专线控制与测速
-    # ────────────────────────────────────────────────────────────
-
-    def _toggle_proxy(self):
-        """启停专线"""
-        if self._mihomo.is_running():
-            self._mihomo.stop()
-            self.log("⏹ 专线服务已停止")
-        else:
-            self._mihomo.start()
-            self.log("▶ 专线服务已启动")
-        self._refresh_status()
-
-    def _test_latency(self):
-        """专线测速"""
-        self.log("正在对专线节点发起延迟测试…")
-        def _bg():
-            delay = self._mihomo.test_latency()
-            def _update():
-                if delay is not None:
-                    state = "success" if delay < 400 else ("warning" if delay < 1000 else "danger")
-                    self._badge_latency.update_badge(f"● {delay} ms", state)
-                    self.log(f"✓ 专线延迟测试完成: {delay} ms", "success")
-                else:
-                    self._badge_latency.update_badge("超时", "danger")
-                    self.log("✗ 专线延迟测试超时", "error")
-            self.dispatch(_update)
-        threading.Thread(target=_bg, daemon=True).start()
-
-    def _switch_node(self):
-        """切换专线节点"""
-        self.log("正在切换代理节点...")
-        def _bg():
-            new_node = self._mihomo.switch_to_next_node()
-            self.log(f"✓ 已切换至节点: {new_node}", "success")
-            self._refresh_status()
-            self._test_latency()
         threading.Thread(target=_bg, daemon=True).start()
 
     # ────────────────────────────────────────────────────────────

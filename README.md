@@ -2,9 +2,9 @@
 
 <img src="assets/icon.png" width="128" height="128" alt="AntigravityHub Logo" />
 
-# AntigravityHub (反重力综合管理中心)
+# AntigravityHub (反重力补丁注入与汉化中心)
 
-**专为 Google Antigravity IDE 打造的现代化、开箱即用桌面级一键综合管理工具**
+**专为 Google Antigravity IDE 打造的现代化、开箱即用桌面级一键补丁注入与中文汉化管理工具**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D4.svg)](#)
@@ -18,18 +18,17 @@
 ## 🌟 核心特性与功能
 
 ### 1. ⚡ 内置离线补丁一键全自动热注入
-* **完全离线保底**：软件内部直接集成了经过验证的 `version.dll` 代理劫持补丁与完整 `app.asar` 简体中文汉化包，无需联网即可随时一键注入！
-* **热注入与安全检测**：智能检测 Antigravity IDE 运行状态与文件占用，安全写入并智能对齐 `config.json` 专线端口 `7895`。
-* **一键原版还原**：支持随时彻底卸载代理劫持与汉化包，100% 无损还原官方纯净原生状态。
+* **完全离线保底**：软件内部直接集成了经过验证的 `version.dll` 核心补丁与完整 `app.asar` 简体中文汉化包，无需联网即可随时一键注入！
+* **热注入与安全检测**：智能检测 Antigravity IDE 运行状态与文件占用，安全注入补丁并自动对齐可用代理端口。
+* **一键原版还原**：支持随时彻底卸载代理劫持与汉化包，100% 无损还原官方纯净原生英文状态。
 
-### 2. 🛡️ 智能状态检测与决策横幅 (Fluent InfoBar)
-* **开机自检与智能提示**：软件启动后自动探测反重力 IDE 的安装路径、版本号、补丁完整性与专线连通性。
+### 2. 🌐 独立改中文（汉化包注入）
+* 提供独立的「改中文」按钮，一键将官方纯英文界面替换为完整汉化包。
+* 自动备份官方原版 `app.asar.bak`，安全无风险。
+
+### 3. 🛡️ 智能状态检测与决策横幅 (Fluent InfoBar)
+* **开机自检与智能提示**：软件启动后自动探测反重力 IDE 的安装路径、版本号、补丁完整性与语言状态。
 * **决策横幅**：若检测到处于官方原生或补丁缺失状态，顶部智能横幅将主动提示是否一键注入，免去繁琐的人工排查。
-
-### 3. 🚀 内置定向代理专线直连 (Mihomo 内核)
-* **独立 7895 专线**：内置 Mihomo 独立核心服务，为反重力 IDE 建立独享通道。
-* **多节点故障转移 (Failover)**：首选韩国专线高速节点，异常时秒级平滑切换至备用原生节点。
-* **实时测速与节点切换**：支持界面一键发起延迟探测与节点快速轮换。
 
 ### 4. 🎨 现代极简设计 (Windows 11 Fluent / Mica 质感)
 * **全新 3D 悬浮水晶图标**：精心设计的反重力量子悬浮环与高光上升晶体 Logo。
@@ -58,34 +57,11 @@ python main.py
 
 ### 单文件构建打包 (PyInstaller)
 ```bash
-pyinstaller --noconfirm AntigravityHub.spec
+pyinstaller AntigravityHub.spec --noconfirm
 ```
-编译产物将生成在 `dist/AntigravityHub.exe`。
-
----
-
-## 📂 项目架构
-
-```
-AntigravityHub/
-├── assets/                  # 高清图标资源 (icon.ico, icon.png)
-├── builtin_assets/          # 内置离线补丁基线库 (version.dll, app.asar)
-├── config/                  # 软件基础配置文件
-├── core/                    # 核心业务逻辑
-│   ├── antigravity_manager.py
-│   ├── injector.py          # 离线热注入与还原核心
-│   ├── mihomo_service.py    # 专线服务管理与控制
-│   └── updater.py           # 云端更新检查
-├── ui/                      # 现代化 CustomTkinter 界面
-│   ├── win_app_window.py    # 主管理中心窗口
-│   └── win_components.py    # 状态胶囊、主题色彩与组件
-├── tests/                   # 自动化单元测试套件
-├── AntigravityHub.spec      # PyInstaller 打包构建规范
-└── main.py                  # 应用程序启动入口
-```
+打包生成的可执行文件位于 `dist/AntigravityHub.exe`。
 
 ---
 
 ## 📄 开源许可证
-
-本项目基于 [MIT License](LICENSE) 开源。仅供学习交流与个人开发效率提升使用。
+本项目遵循 [MIT License](LICENSE) 开源协议。
