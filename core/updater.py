@@ -69,9 +69,8 @@ def _fetch_json(url: str, timeout: int = 6) -> dict:
     # 候选代理
     proxy_candidates = [
         None,
-        {"http": "http://127.0.0.1:7895", "https": "http://127.0.0.1:7895"},
         {"http": "http://127.0.0.1:7890", "https": "http://127.0.0.1:7890"},
-        {"http": "socks5://127.0.0.1:7895", "https": "socks5://127.0.0.1:7895"},
+        {"http": "socks5://127.0.0.1:7890", "https": "socks5://127.0.0.1:7890"},
     ]
 
     # 1. 尝试直连与本地代理
@@ -114,9 +113,8 @@ def _download_with_mirror(original_url: str, dest: Path,
     ]
     proxies_options = [
         None,
-        {"http": "http://127.0.0.1:7895", "https": "http://127.0.0.1:7895"},
-        {"http": "socks5://127.0.0.1:7895", "https": "socks5://127.0.0.1:7895"},
         {"http": "http://127.0.0.1:7890", "https": "http://127.0.0.1:7890"},
+        {"http": "socks5://127.0.0.1:7890", "https": "socks5://127.0.0.1:7890"},
     ]
 
     for url in urls_to_try:

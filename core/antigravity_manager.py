@@ -22,7 +22,7 @@ BACKUP_DIR = Path(r"C:\Users\22816\antigravity_proxy\backup")
 BACKUP_DLL = BACKUP_DIR / "version.dll"
 BACKUP_CONFIG = BACKUP_DIR / "config.json"
 
-REQUIRED_PROXY_PORT = 7895
+REQUIRED_PROXY_PORT = 7890
 
 
 @dataclass

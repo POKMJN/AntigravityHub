@@ -95,7 +95,7 @@ class TestAntigravityManager(unittest.TestCase):
             mock_backup_dir.mkdir()
 
             # 写一个端口错误的 config.json
-            bad_config = {"proxy": {"port": 7890, "host": "127.0.0.1", "type": "socks5"}}
+            bad_config = {"proxy": {"port": 1234, "host": "127.0.0.1", "type": "socks5"}}
             (mock_ag_dir / "config.json").write_text(json.dumps(bad_config))
 
             # 写一个备份 version.dll（内容随意）
@@ -125,7 +125,7 @@ class TestAntigravityManager(unittest.TestCase):
 
                 actions = mgr.heal()
                 self.assertTrue(any("version.dll" in a for a in actions))
-                self.assertTrue(any("7895" in a for a in actions))
+                self.assertTrue(any("7890" in a for a in actions))
 
                 # 验证修复后状态
                 status2 = mgr.get_status()

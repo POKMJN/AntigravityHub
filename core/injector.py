@@ -45,7 +45,7 @@ class InjectionStatus(NamedTuple):
     is_installed: bool          # 反重力是否已安装
     is_running: bool            # 反重力当前是否在运行
     proxy_injected: bool        # version.dll 是否到位
-    port_configured: bool       # config.json 端口是否为 7895
+    port_configured: bool       # config.json 端口是否为 7890
     cn_injected: bool           # 汉化包是否已注入
     version_str: str            # IDE 版本号
     needs_injection: bool       # 是否需要补丁注入/修复
@@ -108,13 +108,13 @@ class PatchInjector:
         # 1. 检查 version.dll (存在且大于 100KB)
         proxy_injected = AG_DLL.exists() and AG_DLL.stat().st_size > 100_000
 
-        # 2. 检查 config.json 代理端口 (支持 7895 专线或 7890 本地客户端)
+        # 2. 检查 config.json 代理端口是否严格对齐 7890
         port_configured = False
         if AG_CONFIG.exists():
             try:
                 data = json.loads(AG_CONFIG.read_text(encoding="utf-8"))
                 p = data.get("proxy", {}).get("port")
-                port_configured = (p in (7895, 7890))
+                port_configured = (p == 7890)
             except Exception:
                 port_configured = False
 
@@ -133,12 +133,12 @@ class PatchInjector:
             summary = "未检测到 Antigravity 安装目录"
         elif needs_injection:
             missing = []
-            if not proxy_injected: missing.append("代理补丁未注入")
-            if not port_configured: missing.append("端口未对齐7895")
+            if not proxy_injected: missing.append("免代理补丁未注入")
+            if not port_configured: missing.append("端口未对齐7890")
             if not cn_injected: missing.append("汉化包未注入")
             summary = "，".join(missing) + "（建议立即注入）"
         else:
-            summary = "全部补丁就绪（代理已劫持，端口7895，已汉化）"
+            summary = "全部补丁就绪（免代理补丁已就绪，端口对齐7890，已汉化）"
 
         return InjectionStatus(
             is_installed=is_installed,
@@ -199,23 +199,14 @@ class PatchInjector:
             if "proxy" not in config_data:
                 config_data["proxy"] = {}
 
-            target_port = 7895
-            for test_p in (7895, 7890):
-                try:
-                    import socket
-                    with socket.create_connection(("127.0.0.1", test_p), timeout=0.3):
-                        target_port = test_p
-                        break
-                except Exception:
-                    pass
-
+            target_port = 7890
             config_data["proxy"]["port"] = target_port
             config_data["proxy"]["host"] = "127.0.0.1"
             config_data["proxy"]["type"] = "socks5"
             config_data["proxy"]["enabled"] = True
 
             AG_CONFIG.write_text(json.dumps(config_data, indent=2, ensure_ascii=False), encoding="utf-8")
-            log(f"✓ 已同步定向代理端口配置 ({target_port} 专线对齐)")
+            log(f"✓ 已同步代理端口配置 (严格对齐 127.0.0.1:{target_port})")
             return True
         except Exception as e:
             log(f"✗ 写入 config.json 失败：{e}")

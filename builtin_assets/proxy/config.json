@@ -8,7 +8,7 @@
   "proxy": {
     "type": "socks5",
     "host": "127.0.0.1",
-    "port": 7895
+    "port": 7890
   },
   "fake_ip": {
     "cidr": "198.18.0.0/15",
